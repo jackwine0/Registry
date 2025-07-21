@@ -1,0 +1,253 @@
+/* Home Page - Responsive Carousel Styles */
+.home-page {
+  padding: 1rem;
+  background-color: #0a0a12;
+  color: #00ff41;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Loading Screen */
+.loading-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #0a0a12;
+}
+
+.loading-container {
+  text-align: center;
+  max-width: 90%;
+  padding: 0 1rem;
+}
+
+.loading-icon {
+  font-size: 2.5rem;
+  color: #00cc33;
+  margin-bottom: 1rem;
+  animation: pulse 2s infinite;
+}
+
+.loading-text {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.05rem;
+}
+
+.loading-subtext {
+  font-size: 0.8rem;
+  color: #aaaaaa;
+  margin-bottom: 1.5rem;
+}
+
+.loading-bar {
+  width: 100%;
+  height: 3px;
+  background-color: #1a1a1a;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+/* Carousel Header */
+.carousel-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px dashed #1a4a1a;
+  padding-bottom: 1rem;
+}
+
+.carousel-title {
+  font-size: 1.5rem;
+  letter-spacing: 0.05rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.title-icon {
+  color: #ff5555;
+}
+
+.carousel-subtitle {
+  color: #aaaaaa;
+  font-size: 0.8rem;
+  max-width: 90%;
+  margin: 0 auto;
+  line-height: 1.4;
+}
+
+/* Carousel Container */
+.carousel-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0 auto 1.5rem;
+  width: 100%;
+  position: relative;
+  padding: 0 1rem;
+}
+
+.carousel-container {
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  width: 100%;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  scroll-snap-type: x mandatory;
+  padding: 0.5rem 0;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 15px;
+  padding: 0 1rem;
+}
+
+.carousel-card-wrapper {
+  flex: 0 0 calc(100% - 2rem);
+  scroll-snap-align: start;
+  transition: transform 0.3s ease;
+}
+
+/* Navigation Buttons */
+.carousel-button {
+  background-color: #12121a;
+  border: 1px solid #1a4a1a;
+  color: #00ff41;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: none; /* Hidden by default on mobile */
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.carousel-button.prev {
+  left: 0;
+}
+
+.carousel-button.next {
+  right: 0;
+}
+
+.carousel-button:hover {
+  background-color: #1a3a1a;
+  border-color: #00ff41;
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+}
+
+/* Hide scrollbar but keep functionality */
+.carousel-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Indicators */
+.carousel-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #1a4a1a;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.indicator.active {
+  background-color: #00ff41;
+  transform: scale(1.2);
+}
+
+.indicator:hover {
+  background-color: #00cc33;
+}
+
+/* Animations (unchanged) */
+@keyframes loading {
+  0% { width: 0; }
+  50% { width: 100%; }
+  100% { width: 0; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.7; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+/* Tablet Styles */
+@media (min-width: 768px) {
+  .home-page {
+    padding: 2rem;
+  }
+
+  .carousel-title {
+    font-size: 1.8rem;
+    gap: 1rem;
+  }
+
+  .carousel-subtitle {
+    font-size: 0.9rem;
+    max-width: 600px;
+  }
+
+  .carousel-card-wrapper {
+    flex: 0 0 calc(50% - 1rem);
+  }
+
+  .carousel-button {
+    display: flex; /* Show buttons on tablet and up */
+  }
+
+  
+}
+
+/* Desktop Styles */
+@media (min-width: 1024px) {
+  .carousel-container {
+    width: calc(300px * 3 + 40px);
+  }
+
+  .carousel-card-wrapper {
+    flex: 0 0 300px;
+  }
+
+  .carousel-button.prev {
+    left: 10px;
+  }
+
+  .carousel-button.next {
+    right: 10px;
+  }
+
+  
+}
+
+/* Large Desktop Styles */
+@media (min-width: 1280px) {
+  .carousel-container {
+    width: calc(320px * 3 + 60px);
+  }
+
+  .carousel-card-wrapper {
+    flex: 0 0 320px;
+  }
+
+  
+}

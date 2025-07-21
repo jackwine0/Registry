@@ -1,0 +1,189 @@
+/* src/styles/global.css */
+
+/* Base Styles */
+:root {
+  --primary-dark: #0a0a12;
+  --secondary-dark: #12121a;
+  --primary-accent: #00ff41;
+  --secondary-accent: #00cc33;
+  --warning-accent: #ff5555;
+  --text-primary: #e0e0e0;
+  --text-secondary: #aaaaaa;
+  --text-tertiary: #666666;
+  --border-primary: #1a4a1a;
+  --border-secondary: #2a5a2a;
+  --highlight: rgba(0, 255, 65, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--primary-dark);
+  color: var(--primary-accent);
+  font-family: 'Courier New', monospace, system-ui;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  letter-spacing: 0.05rem;
+  text-shadow: 0 0 5px var(--highlight);
+  margin-bottom: 1rem;
+}
+
+h1 {
+  font-size: 2rem;
+  border-bottom: 1px solid var(--border-primary);
+  padding-bottom: 0.5rem;
+}
+
+h2 {
+  font-size: 1.75rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+p {
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+a {
+  color: var(--secondary-accent);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: var(--primary-accent);
+  text-decoration: underline;
+}
+
+
+
+
+/* Cards */
+.card {
+  background-color: var(--secondary-dark);
+  border: 1px solid var(--border-primary);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.card::before {
+  content: "CONFIDENTIAL";
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: var(--primary-dark);
+  color: var(--warning-accent);
+  font-size: 0.6rem;
+  padding: 0.2rem 0.5rem;
+  border-left: 1px solid var(--border-primary);
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.card-header {
+  border-bottom: 1px dashed var(--border-primary);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+}
+
+th {
+  background-color: #1a2a1a;
+  color: var(--primary-accent);
+  padding: 0.75rem;
+  text-align: left;
+  border: 1px solid var(--border-primary);
+}
+
+td {
+  padding: 0.75rem;
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+}
+
+tr:nth-child(even) {
+  background-color: var(--secondary-dark);
+}
+
+
+
+/* Utility Classes */
+
+
+.security-banner {
+  background-color: #1a1a1a;
+  color: var(--warning-accent);
+  padding: 0.5rem;
+  font-size: 0.7rem;
+  text-align: center;
+  border-top: 1px solid var(--warning-accent);
+  border-bottom: 1px solid var(--warning-accent);
+  margin: 1rem 0;
+}
+
+/* Terminal Effect */
+.terminal-effect {
+  position: relative;
+}
+
+.terminal-effect::after {
+  content: "|";
+  animation: blink 1s infinite;
+  position: absolute;
+  right: -0.5rem;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Layout */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.section {
+  padding: 2rem 0;
+  border-bottom: 1px dashed var(--border-primary);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--primary-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-accent);
+}

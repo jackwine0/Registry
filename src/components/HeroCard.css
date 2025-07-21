@@ -1,0 +1,279 @@
+/* AGENT DOSSIER CARD */
+.agent-dossier-card {
+  width: 100%;
+  max-width: 300px; /* Keeps layout readable on desktop */
+  background: var(--secondary-dark); /* Corrected variable syntax */
+  border: 1px solid #1a3a2a;
+  border-radius: 4px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  margin: 1rem auto;
+  z-index: 1;
+}
+
+.agent-dossier-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+
+/* Responsive tweak to show multiple cards nicely in grid or flex */
+@media (max-width: 1024px) {
+  .agent-dossier-card {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 600px) {
+  .agent-dossier-card {
+    max-width: 95%;
+    margin: 1rem auto;
+  }
+}
+
+
+.agent-dossier-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #00e676, #00b248);
+  z-index: 2;
+}
+
+.agent-dossier-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 28px rgba(0, 230, 118, 0.15);
+  border-color: #00e676;
+}
+
+/* SECURITY TAPES */
+.classification-tape {
+  position: relative;
+  padding: 0.4rem 0;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-align: center;
+  text-transform: uppercase;
+  background: repeating-linear-gradient(
+    45deg,
+    #d50000,
+    #d50000 10px,
+    #b71c1c 10px,
+    #b71c1c 20px
+  );
+  color: white;
+  z-index: 3;
+}
+
+.classification-tape::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, 
+    rgba(0,0,0,0) 0%, 
+    rgba(255,255,255,0.6) 50%, 
+    rgba(0,0,0,0) 100%);
+}
+
+/* AGENT PHOTO */
+.agent-photo-container {
+  position: relative;
+  height: 240px;
+  overflow: hidden;
+  border-bottom: 1px solid #1a3a2a;
+}
+
+.agent-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: sepia(30%) contrast(110%);
+  transition: all 0.5s ease;
+}
+
+.agent-dossier-card:hover .agent-photo {
+  filter: sepia(0%) contrast(120%);
+  transform: scale(1.03);
+}
+
+/* VERIFICATION BADGE */
+.verification-stamp {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: #00e676;
+  padding: 0.5rem 1rem;
+  font-size: 0.7rem;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid #00e676;
+  backdrop-filter: blur(4px);
+}
+
+.verification-icon {
+  font-size: 0.8rem;
+  color: #00e676;
+}
+
+/* IDENTITY SECTION */
+.identity-section {
+  padding: 1.2rem 1.2rem 0;
+  border-bottom: 1px dashed #1e3a2a;
+}
+
+.codename {
+  font-size: 1.4rem;
+  margin: 0 0 0.5rem;
+  color: #00e676;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  letter-spacing: 0.5px;
+}
+
+.full-identity {
+  font-size: 0.85rem;
+  color: #bdbdbd;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.identity-icon {
+  font-size: 0.9rem;
+  color: #00b248;
+  flex-shrink: 0;
+}
+
+/* THREAT ASSESSMENT */
+.threat-assessment {
+  padding: 1.2rem;
+}
+
+.threat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.threat-title {
+  font-size: 0.75rem;
+  color: #ff5252;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.threat-value {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #00e676;
+}
+
+.threat-meter {
+  height: 8px;
+  background-color: #1a1a2a;
+  overflow: hidden;
+  margin-bottom: 0.8rem;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);
+}
+
+.threat-progress {
+  height: 100%;
+  background: linear-gradient(90deg, #ff5252, #ff8a50);
+  transition: width 0.8s ease;
+}
+
+/* STATS GRID */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.8rem;
+ padding: 1rem;
+}
+
+.stat-pill {
+  background: rgba(30, 58, 42, 0.3);
+  border: 1px solid #1e3a2a;
+  padding: 0.6rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.agent-dossier-card:hover .stat-pill {
+  border-color: #00b248;
+  background: rgba(0, 182, 72, 0.1);
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  color: #bdbdbd;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.3rem;
+}
+
+.stat-value {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #00e676;
+}
+
+/* CLEARANCE LEVEL */
+.clearance-level {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 1rem;
+  background: rgba(30, 58, 42, 0.2);
+  border-top: 1px dashed #1e3a2a;
+  font-size: 0.8rem;
+  color: #00b248;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.clearance-icon {
+  font-size: 0.9rem;
+}
+
+/* ANIMATIONS */
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(0, 230, 118, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 230, 118, 0); }
+}
+
+.agent-dossier-card:hover {
+  animation: pulse-glow 1.5s infinite;
+}
+
+/* RESPONSIVE ADJUSTMENTS */
+@media (max-width: 768px) {
+  .agent-dossier-card {
+    width: 280px;
+  }
+  
+  .agent-photo-container {
+    height: 220px;
+  }
+}
