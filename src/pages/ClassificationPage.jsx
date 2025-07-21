@@ -27,7 +27,7 @@ const ClassificationPage = () => {
     // Load heroes data
     const loadHeroes = async () => {
       try {
-        const data = await getMultipleHeroes(1, 500); // Load enough heroes for pagination
+        const data = await getMultipleHeroes(1, 200); // Load enough heroes for pagination
         setHeroes(data);
         applyFilter(filter, data);
       } catch (error) {

@@ -20,14 +20,13 @@ function App() {
     <div className="app">
       <Navbar onSearch={handleSearch} />
       <Suspense fallback={<div className="loading-screen"></div>}>
-  <Routes>
-    <Route path="/" element={<HomePage />} />
-    <Route path="/details/:id" element={<Details />} />
-    <Route path="/search-results" element={<SearchResults />} />
-    <Route path="/classification" element={<ClassificationPage />} />
-   
-  </Routes>
-</Suspense>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/details/:id" element={<Details />} />
+          <Route path="/search-results" element={<SearchResults />} />
+          <Route path="/classification" element={<ClassificationPage />} />
+        </Routes>
+      </Suspense>
       <Footer />
     </div>
   );
