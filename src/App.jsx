@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import HomePage from "./pages/HomePage";
-import Details from "./pages/Details";
-import SearchResults from "./pages/SearchResults";
+import { lazy, Suspense } from "react";
+
+const HomePage = lazy(() => import("./pages/HomePage"));
+const Details = lazy(() => import("./pages/Details"));
+const SearchResults = lazy(() => import("./pages/SearchResults"));
+const ClassificationPage = lazy(() => import("./pages/ClassificationPage"));
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import ClassificationPage from "./pages/ClassificationPage";
 
 function App() {
   const navigate = useNavigate();
@@ -17,12 +19,15 @@ function App() {
   return (
     <div className="app">
       <Navbar onSearch={handleSearch} />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/details/:id" element={<Details />} />{" "}
-        <Route path="/search-results" element={<SearchResults />} />
-        <Route path="/classification" element={<ClassificationPage />} />
-      </Routes>
+      <Suspense fallback={<div className="loading-screen"></div>}>
+  <Routes>
+    <Route path="/" element={<HomePage />} />
+    <Route path="/details/:id" element={<Details />} />
+    <Route path="/search-results" element={<SearchResults />} />
+    <Route path="/classification" element={<ClassificationPage />} />
+   
+  </Routes>
+</Suspense>
       <Footer />
     </div>
   );
