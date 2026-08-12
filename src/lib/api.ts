@@ -1,12 +1,20 @@
 import type { Alignment, Character, Universe } from '../types/character'
 
 // ---------------------------------------------------------------------------
-// Data layer. Talks to the local Express proxy in /server, which fetches from
-// the Comic Vine API server-side (Comic Vine doesn't support CORS, so a
-// direct browser call would be blocked — see server/comicvine.js) and
-// normalizes results into the Character shape below. In dev, Vite proxies
-// /api to that server (see vite.config.ts); in production the same server
-// also serves the built frontend, so it's all same-origin.
+// Data layer. Talks to a small backend that fetches from the Comic Vine API
+// server-side (Comic Vine doesn't support CORS, so a direct browser call
+// would be blocked — see server/comicvine.js) and normalizes results into
+// the Character shape below. Two deployment shapes are supported:
+//
+// - Local dev / Render: the Express server in /server serves everything
+//   live, including /api/roster.
+// - Vercel: the full roster is pre-built at deploy time into a static
+//   /roster.json (see scripts/generate-roster.mjs) — cheap to fetch, no
+//   cold-start risk — while single-character lookups, batches, and live
+//   search are handled by lightweight serverless functions in /api.
+//
+// getRoster() below tries the static snapshot first and falls back to the
+// live endpoint, so the same frontend code works unmodified either way.
 // ---------------------------------------------------------------------------
 
 export interface SearchFilters {
@@ -30,15 +38,18 @@ async function getJSON<T>(url: string): Promise<T> {
   return res.json()
 }
 
-// The curated roster is small and cheap to keep around client-side for
-// filters, "all characters" views, and ally/enemy lookups.
+// The roster is small and cheap to keep around client-side for filters,
+// "all characters" views, random sampling, and ally/enemy lookups.
 let rosterPromise: Promise<Character[]> | null = null
 function getRoster(): Promise<Character[]> {
   if (!rosterPromise) {
-    rosterPromise = getJSON<Character[]>('/api/roster').catch((err) => {
-      rosterPromise = null
-      throw err
-    })
+    rosterPromise = getJSON<Character[]>('/roster.json')
+      .then((data) => (data.length > 0 ? data : getJSON<Character[]>('/api/roster')))
+      .catch(() => getJSON<Character[]>('/api/roster'))
+      .catch((err) => {
+        rosterPromise = null
+        throw err
+      })
   }
   return rosterPromise
 }
@@ -102,9 +113,10 @@ export async function searchCharacters(filters: SearchFilters): Promise<Characte
 }
 
 export async function fetchRandomCharacters(count: number, alignment?: Alignment): Promise<Character[]> {
-  const qs = new URLSearchParams({ count: String(count) })
-  if (alignment) qs.set('alignment', alignment)
-  return getJSON<Character[]>(`/api/random?${qs.toString()}`)
+  const roster = await getRoster()
+  const pool = alignment ? roster.filter((c) => c.alignment === alignment) : roster
+  const shuffled = [...pool].sort(() => Math.random() - 0.5)
+  return shuffled.slice(0, count)
 }
 
 export async function getFilterOptions() {

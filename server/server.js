@@ -3,8 +3,8 @@ import express from 'express'
 import cors from 'cors'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { ROSTER } from './roster.js'
-import { findBestMatch, getCharacterDetail, listPopularCharacters, normalizeCharacter, searchCharacters } from './comicvine.js'
+import { buildRoster } from './build-roster.js'
+import { getCharacterDetail, normalizeCharacter, searchCharacters } from './comicvine.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -22,7 +22,11 @@ app.use(cors())
 app.use(express.json())
 
 // --- tiny in-memory caches so a browser session doesn't hammer Comic Vine's
-// rate limit (and so repeat visits feel instant) ---------------------------
+// rate limit (and so repeat visits feel instant). This works well here
+// because this Express process stays warm between requests (local dev /
+// Render) — see server/build-roster.js and scripts/generate-roster.mjs for
+// why Vercel's deployment takes a different approach (a build-time static
+// snapshot instead of an in-memory cache). ------------------------------
 const detailCache = new Map() // id -> normalized character
 const CACHE_TTL = 1000 * 60 * 60 // 1 hour
 let rosterPromise = null
@@ -40,67 +44,17 @@ function cacheSet(map, key, value) {
   map.set(key, { value, ts: Date.now() })
 }
 
-async function resolveRosterEntry(entry) {
-  const match = await findBestMatch(entry.query)
-  if (!match) return null
-  const detail = await getCharacterDetail(match.id)
-  const normalized = normalizeCharacter(detail, entry)
-  cacheSet(detailCache, normalized.id, normalized)
-  return normalized
-}
-
-// Extra pages pulled from Comic Vine's bulk /characters/ listing, sorted by
-// how often each character has actually appeared in a comic. This is what
-// lets the archive scale to hundreds of entries instead of only the curated
-// hero/villain list — one request per 100 characters, fully detailed,
-// rather than a search+detail round trip per name. These extras have no
-// known alignment (Comic Vine doesn't provide one), so they land in the
-// "neutral" bucket unless they happen to match a curated entry.
-const BULK_PAGES = 2 // 2 x 100 = up to 200 extra characters
-const BULK_PAGE_SIZE = 100
-
-async function fetchBulkPage(offset) {
-  const results = await listPopularCharacters(BULK_PAGE_SIZE, offset)
-  return results.map((r) => normalizeCharacter(r))
-}
-
-async function buildRoster() {
-  const settledCurated = await Promise.allSettled(ROSTER.map(resolveRosterEntry))
-  const curated = settledCurated
-    .filter((r) => r.status === 'fulfilled' && r.value)
-    .map((r) => r.value)
-
-  const settledBulk = await Promise.allSettled(
-    Array.from({ length: BULK_PAGES }, (_, i) => fetchBulkPage(i * BULK_PAGE_SIZE))
-  )
-  const bulk = settledBulk
-    .filter((r) => r.status === 'fulfilled')
-    .flatMap((r) => r.value)
-
-  const seen = new Set(curated.map((c) => c.id))
-  const extras = []
-  for (const c of bulk) {
-    if (seen.has(c.id)) continue
-    seen.add(c.id)
-    cacheSet(detailCache, c.id, c)
-    extras.push(c)
-  }
-
-  const characters = [...curated, ...extras]
-  if (characters.length === 0) {
-    const failed = settledCurated.find((r) => r.status === 'rejected')
-    throw failed?.reason || new Error('Failed to load roster from Comic Vine')
-  }
-  console.log(`Roster loaded: ${curated.length} curated + ${extras.length} additional = ${characters.length} total`)
-  return characters
-}
-
 function getRoster() {
   if (!rosterPromise) {
-    rosterPromise = buildRoster().catch((err) => {
-      rosterPromise = null // allow retry on next request
-      throw err
-    })
+    rosterPromise = buildRoster()
+      .then((characters) => {
+        for (const c of characters) cacheSet(detailCache, c.id, c)
+        return characters
+      })
+      .catch((err) => {
+        rosterPromise = null // allow retry on next request
+        throw err
+      })
   }
   return rosterPromise
 }
@@ -141,7 +95,7 @@ app.get('/api/characters/:id', async (req, res) => {
   }
 })
 
-// GET /api/characters/batch?ids=1,2,3 — used to resolve allies/enemies
+// GET /api/characters-batch?ids=1,2,3 — used to resolve allies/enemies
 app.get('/api/characters-batch', async (req, res) => {
   const ids = String(req.query.ids || '')
     .split(',')
@@ -218,7 +172,7 @@ app.get('*', (req, res, next) => {
   })
 })
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Registry Division API proxy running on http://localhost:${PORT}`)
   if (!process.env.COMICVINE_API_KEY) {
     console.warn('⚠️  No COMICVINE_API_KEY set — requests to Comic Vine will fail until you add one to server/.env')

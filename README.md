@@ -64,7 +64,42 @@ npm run build      # builds the frontend into dist/
 npm run server      # serves dist/ + the API on one port (8787)
 ```
 Then open http://localhost:8787 — everything's on one origin, no CORS setup
-needed.
+needed. This is the setup to use on Render or any other host that runs a
+persistent Node process.
+
+### Deploying to Vercel
+
+Vercel's functions are stateless and cold-start per request, which doesn't
+suit the roster-building step as-is — it makes ~170+ Comic Vine requests and
+normally relies on staying cached in a long-lived process. So the Vercel
+setup works a little differently from local dev / Render:
+
+- **The full roster is pre-built at deploy time**, not per-request. A
+  `prebuild` script (`scripts/generate-roster.mjs`) runs automatically
+  before `vite build` and writes a static `public/roster.json` snapshot —
+  it ships as a plain file on Vercel's CDN, so loading it is instant and
+  there's no cold-start or rate-limit risk.
+- **Single-character lookups, ally/enemy batches, and live search** are
+  genuinely request-time things (they can't be known at build time), so
+  those stay as real serverless functions under `/api` — but each one is a
+  single fast Comic Vine call, well within normal function limits.
+
+To deploy:
+
+1. Push this project to a Git repo and import it in Vercel (or run `vercel`
+   from this directory with the Vercel CLI).
+2. In **Project Settings → Environment Variables**, add `COMICVINE_API_KEY`
+   (available to Production, Preview, and Development, and — importantly —
+   to the **Build** step, since that's when `roster.json` gets generated).
+3. Deploy. `vercel.json` in this repo handles routing (SPA fallback to
+   `index.html` for client-side routes, without swallowing `/api/*` or
+   `/roster.json`) and points Vercel at `npm run build` / `dist`.
+
+If a deploy's roster looks thin or empty, check `/api/health` on the
+deployed URL — it reports whether `COMICVINE_API_KEY` was seen and how many
+characters made it into the snapshot. A `rosterSnapshotSize` of 0 almost
+always means the env var wasn't set (or wasn't set for the Build
+environment) at deploy time — add/fix it and redeploy.
 
 ## Data — how the archive gets large
 
@@ -115,9 +150,14 @@ collections are stored client-side via Zustand + localStorage
   whole app re-themes from that one file.
 - Fonts: Bebas Neue for display headlines, IBM Plex Mono for body/stats —
   loaded from Google Fonts in `index.html`.
-- Comic Vine's rate limit is generous but not unlimited — the in-memory
-  cache in `server/server.js` keeps repeat requests cheap. If you deploy
-  this, consider swapping the cache for Redis or similar so it survives
-  restarts and works across multiple server instances.
+- Comic Vine's rate limit is generous but not unlimited. On Render/local, the
+  in-memory cache in `server/server.js` keeps repeat requests cheap; on
+  Vercel, the build-time `roster.json` snapshot means the bulk of the data
+  costs nothing per-request at all — only single-character/search calls hit
+  Comic Vine live, per the Vercel section above.
+- `server/comicvine.js` and `server/build-roster.js` are the shared source
+  of truth for all three deployment paths (Express dev server, the
+  build-time snapshot script, and the Vercel functions in `/api`) — fix a
+  bug once, it's fixed everywhere.
 - Not affiliated with Marvel, DC, Comic Vine, or any publisher — this is a
   personal/demo project that consumes Comic Vine's public API.

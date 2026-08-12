@@ -9,7 +9,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "server": "node server/server.js",
-    "dev:full": "concurrently -n web,api -c blue,magenta \"npm:dev\" \"npm:server\""
+    "dev:full": "concurrently -n web,api -c blue,magenta \"npm:dev\" \"npm:server\"",
+    "prebuild": "node scripts/generate-roster.mjs"
   },
   "dependencies": {
     "framer-motion": "^12.43.0",
